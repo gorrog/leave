@@ -89,3 +89,4 @@ ENV/
 .ropeproject
 .functional_tests.py.swp
 *.swp
+*.sqlite3

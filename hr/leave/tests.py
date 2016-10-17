@@ -1,7 +1,10 @@
+from django.urls import resolve
 from django.test import TestCase
 
-class SmokeTest(TestCase):
+from leave.views import login_page
 
-    def test_something_ridiculous(self):
-        self.assertEqual(1,3)
+class LoginPageTest(TestCase):
 
+    def test_root_url_resolves_to_login_page_view(self):
+        found = resolve('/')
+        self.assertEqual(found.func, login_page)
