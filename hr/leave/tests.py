@@ -15,7 +15,5 @@ class LoginPageTest(TestCase):
         request = HttpRequest()
         response = login_page(request)
         expected_html = render_to_string('login.html')
-        print("response is: {}".format(response.content.decode()))
-        print("expected_html is: {}".format(expected_html))
         self.assertEqual(response.content.decode(), expected_html)
 

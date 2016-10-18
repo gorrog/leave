@@ -23,9 +23,13 @@ class BobVisitorTest(unittest.TestCase):
         self.assertIn("Log In", self.browser.title)
 
         # He sees that there is a form for logging on.
-        self.fail("Finish the test")
+        login_legend = self.browser.find_element_by_css_selector(
+            "#login_form fieldset legend"
+        )
+        self.assertEqual(login_legend.text, "Log In")
 
         # He clicks in the first field he sees.
+        self.fail("Finish the test")
 
         # He sees that the field mentions his username.
 
