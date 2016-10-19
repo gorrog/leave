@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 import unittest
 
 class BobVisitorTest(unittest.TestCase):
@@ -17,6 +18,10 @@ class BobVisitorTest(unittest.TestCase):
         # after some rummaging, finds the username and password he wrote down
         # for his user account.
         self.browser.get("http://localhost:8000")
+
+        # Because Bob isn't logged in, he is automatically redirected to the
+        # login URL
+        self.assertIn("login", self.browser.current_url)
 
         # He sees that the app mentions 'Leave' and 'Log in' in the title.
         self.assertIn("Leave", self.browser.title)
@@ -41,13 +46,16 @@ class BobVisitorTest(unittest.TestCase):
         self.assertIn("User Name", username_label.text)
 
         # He enters his real name (not his username)
-        self.fail("Finish the test")
+        username_input.send_keys("Bob")
 
         # He then hits enter (Bob is a little slow).
-        self.fail("Finish the test")
+        username_input.send_keys(Keys.ENTER)
 
         # He is informed that he didn't enter his password.
-        self.fail("Finish the test")
+        error_message = self.browser.find_elements_by_css_selector(
+                "section#error p"
+                )
+        self.assertIn("enter your password", error_message.text)
 
         # He clicks in the password field and enters his password incorrectly.
         self.fail("Finish the test")
