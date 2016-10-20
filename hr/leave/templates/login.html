@@ -2,8 +2,21 @@
 {% block title %}
       MyLeave - Log In
 {% endblock %}
+{% block message %}
+  {% if error_message %}
+      <section id="error">
+        <h2>
+          Error
+        </h2>
+        <p>
+          {{ error_message }}
+        </p>
+      </section>
+  {% endif %}
+{% endblock %}
 {% block main_content %}
-      <form id="login_form">
+      <form id="login_form" method='POST'>
+        {% csrf_token %}
         <fieldset>
           <legend>
             Log In

@@ -1,11 +1,11 @@
-from django.test import TestCase
+from django.test import LiveServerTestCase
 from django.http import HttpRequest
 from django.template.loader import render_to_string
 from django.contrib.auth.models import AnonymousUser
 
 from leave.views import login_page, home_page
 
-class LoginPageTest(TestCase):
+class LoginPageTest(LiveServerTestCase):
 
 
     def test_home_view_redirects_to_login_page_for_unauthenticated_user(self):
@@ -30,6 +30,26 @@ class LoginPageTest(TestCase):
         expected_html = render_to_string('login.html')
         self.assertEqual(response.content.decode(), expected_html)
 
+    def test_missing_or_empty_password_returns_to_login_page(self):
+        request = HttpRequest()
+        request.method = "POST"
+        request.POST = {
+                "username": "some_name"
+                }
+        response = login_page(request)
+        print("response.status_code is {}".format(response.status_code))
+        self.assertTrue(response.status_code == 200)
+        self.assertIn("Log In", response.content.decode())
+        request = HttpRequest()
+        request.method = "POST"
+        request.POST = {
+                "username": "some_name",
+                "password": ""
+                }
+        response = login_page(request)
+        self.assertTrue(response.status_code == 200)
+        self.assertIn("Log In", response.content.decode())
+
     def test_missing_or_empty_password_returns_error(self):
         request = HttpRequest()
         request.method = "POST"
@@ -37,7 +57,7 @@ class LoginPageTest(TestCase):
                 "username": "some_name"
                 }
         response = login_page(request)
-        self.assertIn( "missing password", response.content.decode)
+        self.assertIn( "Password was missing", response.content.decode())
         request = HttpRequest()
         request.method = "POST"
         request.POST = {
@@ -45,29 +65,5 @@ class LoginPageTest(TestCase):
                 "password": ""
                 }
         response = login_page(request)
-        self.assertIn( "missing password", response.content.decode)
+        self.assertIn( "Password was missing", response.content.decode())
 
-    def test_missing_or_empty_password_redirects_to_login_page(self):
-        request = HttpRequest()
-        request.method = "POST"
-        request.POST = {
-                "username": "some_name"
-                }
-        response = login_page(request)
-        self.assertTrue(response.status_code == 302)
-        self.assertEqual(
-                response.__getitem__("location"),
-                "/login/?next="
-                )
-        request = HttpRequest()
-        request.method = "POST"
-        request.POST = {
-                "username": "some_name",
-                "password": ""
-                }
-        response = login_page(request)
-        self.assertTrue(response.status_code == 302)
-        self.assertEqual(
-                response.__getitem__("location"),
-                "/login/?next="
-                )
