@@ -66,7 +66,10 @@ class BobVisitorTest(LiveServerTestCase):
         password_input.send_keys("Bobobo")
 
         # He clicks the 'login' button.
-        self.fail("Finish the test")
+        login_button = self.browser.find_element_by_css_selector(
+                "input#login_form_button"
+                )
+        login_button.click()
 
         # He is informed that either his username or password is incorrect.
         self.fail("Finish the test")
