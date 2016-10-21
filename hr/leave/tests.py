@@ -27,8 +27,9 @@ class LoginPageTest(LiveServerTestCase):
     def test_login_page_returns_correct_html(self):
         request = HttpRequest()
         response = login_page(request)
-        expected_html = render_to_string('login.html')
-        self.assertEqual(response.content.decode(), expected_html)
+        expected_html = render_to_string('login.html', request=request)
+        self.assertIn("Log In",expected_html)
+        self.assertIn("Log In",response.content.decode())
 
     def test_missing_or_empty_password_returns_to_login_page(self):
         request = HttpRequest()
@@ -37,7 +38,6 @@ class LoginPageTest(LiveServerTestCase):
                 "username": "some_name"
                 }
         response = login_page(request)
-        print("response.status_code is {}".format(response.status_code))
         self.assertTrue(response.status_code == 200)
         self.assertIn("Log In", response.content.decode())
         request = HttpRequest()

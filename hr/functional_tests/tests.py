@@ -59,7 +59,11 @@ class BobVisitorTest(LiveServerTestCase):
         self.assertIn("Password was missing or empty", error_message.text)
 
         # He clicks in the password field and enters his password incorrectly.
-        self.fail("Finish the test")
+        password_input = self.browser.find_element_by_css_selector(
+                "input.password"
+                )
+        password_input.click()
+        password_input.send_keys("Bobobo")
 
         # He clicks the 'login' button.
         self.fail("Finish the test")
