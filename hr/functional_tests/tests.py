@@ -1,6 +1,7 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from time import sleep
 
 class BobVisitorTest(LiveServerTestCase):
 
@@ -52,18 +53,20 @@ class BobVisitorTest(LiveServerTestCase):
         # He then hits enter (Bob is a little slow).
         username_input.send_keys(Keys.ENTER)
 
+
         # He is informed that he didn't enter his password.
         error_message = self.browser.find_element_by_css_selector(
                 "section#error p"
                 )
         self.assertIn("Password was missing or empty", error_message.text)
 
-        # He clicks in the password field and enters his password incorrectly.
+        # He clicks in the password field and enters his password.
+        # Bob doesn't realise that the page has refreshed and his username has
+        # been cleared.
         password_input = self.browser.find_element_by_css_selector(
                 "input.password"
                 )
-        password_input.click()
-        password_input.send_keys("Bobobo")
+        password_input.send_keys("Bobobo123")
 
         # He clicks the 'login' button.
         login_button = self.browser.find_element_by_css_selector(
@@ -71,8 +74,43 @@ class BobVisitorTest(LiveServerTestCase):
                 )
         login_button.click()
 
+        ## This appears to be necessary to make Selenium wait for the browser
+        ## to update.
+        sleep(1)
+
+        # He is informed that he didn't enter his password.
+        error_message = self.browser.find_element_by_css_selector(
+                "section#error p"
+                )
+        self.assertIn("Username was missing or empty", error_message.text)
+
+        # Realising that he is having a very bad day, Bob enters his username
+        # and password, but makes a mistake with his password
+        username_input = self.browser.find_element_by_css_selector(
+                "input.username"
+                )
+        username_input.send_keys("Bobby12")
+        password_input = self.browser.find_element_by_css_selector(
+                "input.password"
+                )
+        password_input.send_keys("Bobobo123")
+
+        # He clicks the 'login' button.
+        login_button = self.browser.find_element_by_css_selector(
+                "input#login_form_button"
+                )
+        login_button.click()
+
+        ## This appears to be necessary to make Selenium wait for the browser
+        ## to update.
+        sleep(1)
+
         # He is informed that either his username or password is incorrect.
-        self.fail("Finish the test")
+        error_message = self.browser.find_element_by_css_selector(
+                "section#error p"
+                )
+        self.assertIn("Username or Password was incorrect. Please try again",
+                error_message.text)
 
         # Bob realises that he entered his name instead of his username. He
         # corrects this.

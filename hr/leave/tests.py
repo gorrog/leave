@@ -32,38 +32,54 @@ class LoginPageTest(LiveServerTestCase):
         self.assertIn("Log In",response.content.decode())
 
     def test_missing_or_empty_password_returns_to_login_page(self):
-        request = HttpRequest()
-        request.method = "POST"
-        request.POST = {
-                "username": "some_name"
-                }
-        response = login_page(request)
-        self.assertTrue(response.status_code == 200)
-        self.assertIn("Log In", response.content.decode())
-        request = HttpRequest()
-        request.method = "POST"
-        request.POST = {
+        response = self.client.post('/login/',{"username": "some_name"})
+        self.assertTemplateUsed(response, 'login.html')
+        self.assertContains(response, "Log In", status_code=200)
+        post_data = {
                 "username": "some_name",
                 "password": ""
                 }
-        response = login_page(request)
-        self.assertTrue(response.status_code == 200)
-        self.assertIn("Log In", response.content.decode())
+        response = self.client.post("/login/",post_data)
+        self.assertTemplateUsed(response, 'login.html')
+        self.assertContains(response, "Log In", status_code=200)
+
+    def test_missing_or_empty_username_returns_to_login_page(self):
+        response = self.client.post('/login/',{"password": "some_name"})
+        self.assertTemplateUsed(response, 'login.html')
+        self.assertContains(response, "Log In", status_code=200)
+        post_data = {
+                "username": "",
+                "password": "hello"
+                }
+        response = self.client.post("/login/",post_data)
+        self.assertTemplateUsed(response, 'login.html')
+        self.assertContains(response, "Log In", status_code=200)
 
     def test_missing_or_empty_password_returns_error(self):
-        request = HttpRequest()
-        request.method = "POST"
-        request.POST = {
-                "username": "some_name"
-                }
-        response = login_page(request)
-        self.assertIn( "Password was missing", response.content.decode())
-        request = HttpRequest()
-        request.method = "POST"
-        request.POST = {
+        response = self.client.post('/login/',{"username": "some_name"})
+        self.assertContains(response,"Password was missing")
+        post_data = {
                 "username": "some_name",
                 "password": ""
                 }
-        response = login_page(request)
-        self.assertIn( "Password was missing", response.content.decode())
+        response = self.client.post("/login/",post_data)
+        self.assertContains(response,"Password was missing")
 
+    def test_missing_or_empty_username_returns_error(self):
+        response = self.client.post('/login/',{"password": "blah"})
+        self.assertContains(response,"Username was missing")
+        post_data = {
+                "username": "",
+                "password": "blah"
+                }
+        response = self.client.post("/login/",post_data)
+        self.assertContains(response,"Username was missing")
+
+    def test_wrong_credentials_returns_to_login_page(self):
+        post_data = {
+                "username": "some_name",
+                "password": "blahdeeblah"
+                }
+        response = self.client.post("/login/",post_data)
+        self.assertTemplateUsed(response, 'login.html')
+        self.assertContains(response, "Log In", status_code=200)
