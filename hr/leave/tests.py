@@ -1,11 +1,17 @@
 from django.test import LiveServerTestCase
 from django.http import HttpRequest
 from django.template.loader import render_to_string
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import User, AnonymousUser
 
 from leave.views import login_page, home_page
 
 class LoginPageTest(LiveServerTestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
 
 
     def test_home_view_redirects_to_login_page_for_unauthenticated_user(self):
@@ -83,3 +89,14 @@ class LoginPageTest(LiveServerTestCase):
         response = self.client.post("/login/",post_data)
         self.assertTemplateUsed(response, 'login.html')
         self.assertContains(response, "Log In", status_code=200)
+
+    def test_correct_credentials_redirects_to_home_page_view(self):
+        User.objects.create_user("Bobby12", password = "Bobobo1234")
+        post_data = {
+                "username": "Bobby12",
+                "password": "Bobobo1234"
+                }
+        response = self.client.post("/login/",post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/')
+

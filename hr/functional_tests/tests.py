@@ -1,4 +1,5 @@
 from django.test import LiveServerTestCase
+from django.contrib.auth.models import User
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from time import sleep
@@ -8,6 +9,7 @@ class BobVisitorTest(LiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(3)
+        User.objects.create_user("Bobby12", password = "Bobobo1234")
 
     def tearDown(self):
         self.browser.quit()
@@ -112,21 +114,29 @@ class BobVisitorTest(LiveServerTestCase):
         self.assertIn("Username or Password was incorrect. Please try again",
                 error_message.text)
 
-        # Bob realises that he entered his name instead of his username. He
-        # corrects this.
-        self.fail("Finish the test")
+        # Bob fixes the problem and now finally enters the correct username and
+        # password.
+        username_input = self.browser.find_element_by_css_selector(
+                "input.username"
+                )
+        username_input.send_keys("Bobby12")
+        password_input = self.browser.find_element_by_css_selector(
+                "input.password"
+                )
+        password_input.send_keys("Bobobo1234")
 
         # He hits enter.
-        self.fail("Finish the test")
+        password_input.send_keys(Keys.ENTER)
 
-        # He is informed that either his username or password is incorrect.
-        self.fail("Finish the test")
+        ## This appears to be necessary to make Selenium wait for the browser
+        ## to update.
+        sleep(1)
 
-        # Bob corrects his password and hits Enter.
-        self.fail("Finish the test")
-
-        # He is taken to a new page that has a title "Bob's Leave"
-        self.fail("Finish the test")
+        # He is taken to a new page that has a title "Bobby12's Leave"
+        home_page_title = self.browser.find_element_by_css_selector(
+                "section#main_content h1"
+                )
+        self.assertIn("Bobby12's Leave", home_page_title.text)
 
         # On the top of the page he sees a link to Log off, so he knows he has
         # logged on successfully.

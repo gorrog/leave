@@ -1,10 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 
 @login_required
 def home_page(request):
-    return render(request, "home.html")
+    username = request.user.username
+    context = {
+            'username': username
+            }
+    return render(request, "home.html", context)
 
 def login_page(request):
     if request.method == "POST":
@@ -25,7 +29,7 @@ def login_page(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                # Redirect to success page
+                return redirect('/')
             else:
                 context = {
                         'error_message': 'Your user account has been disabled.'
