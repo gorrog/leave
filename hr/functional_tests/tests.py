@@ -9,12 +9,11 @@ class BobVisitorTest(LiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(3)
-        User.objects.create_user("Bobby12", password = "Bobobo1234")
 
     def tearDown(self):
         self.browser.quit()
 
-    def test_bob_can_log_in(self):
+    def test_login_form_working(self):
         # Bob would like to see how much leave he has available. He remembers
         # being informed that there is a company app for that.
 
@@ -114,6 +113,10 @@ class BobVisitorTest(LiveServerTestCase):
         self.assertIn("Username or Password was incorrect. Please try again",
                 error_message.text)
 
+
+    def test_bob_can_log_in_and_out(self):
+        User.objects.create_user("Bobby12", password = "Bobobo1234")
+        self.browser.get(self.live_server_url)
         # Bob fixes the problem and now finally enters the correct username and
         # password.
         username_input = self.browser.find_element_by_css_selector(
@@ -138,8 +141,31 @@ class BobVisitorTest(LiveServerTestCase):
                 )
         self.assertIn("Bobby12's Leave", home_page_title.text)
 
-        # On the top of the page he sees a link to Log off, so he knows he has
-        # logged on successfully.
+        # On the top of the page he sees a button to Log off, so he knows he
+        # has logged on successfully.
+        logout_button = self.browser.find_element_by_css_selector(
+                "input#logout"
+                )
+        self.assertIn("Log Out", logout_button.get_attribute("value"))
+
+        # Bob accidentally clicks the link!
+        logout_button.click()
+
+        ## This appears to be necessary to make Selenium wait for the browser
+        ## to update.
+        sleep(1)
+
+        # Unfortunately, in response, the system logs Bob off and he is taken
+        # back to the login page
+        self.assertIn("Log In", self.browser.title)
+
+        # Undeterred, Bob enters his username and password and hits Enter.
+        # Amazingly, he makes no mistakes this time
+        self.fail("Finish the test")
+
+        # He is successfully logged in. Bob knows this because he can see the
+        # 'log off' link. He makes a mental note not to click that again until
+        # he wants to log off.
         self.fail("Finish the test")
 
         # On the page Bob can see how many days he has remaining in 2016
@@ -222,7 +248,7 @@ class BobVisitorTest(LiveServerTestCase):
         # Bob sees that he has 23 days of leave remaining for 2018.
         self.fail("Finish the test")
 
-        # Having done all that he wanted to, Bob clicks the "Log Off" link.
+        # Having done all that he wanted to, Bob clicks the "Log Out" link.
         self.fail("Finish the test")
 
         # The page refreshes and the original page mentioning "Log On" is

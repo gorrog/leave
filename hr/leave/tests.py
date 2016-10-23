@@ -2,6 +2,8 @@ from django.test import LiveServerTestCase
 from django.http import HttpRequest
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth import authenticate
+from django.contrib.sessions.models import Session
 
 from leave.views import login_page, home_page
 
@@ -99,4 +101,32 @@ class LoginPageTest(LiveServerTestCase):
         response = self.client.post("/login/",post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/')
+
+class LogoutTest(LiveServerTestCase):
+
+    def setUp(self):
+        username = "Bobby12"
+        password = "Bobobo1234"
+        User.objects.create_user(username, password = password)
+        self.user = authenticate(username=username, password=password)
+        self.client.login(username=username, password=password)
+
+
+    def tearDown(self):
+        pass
+
+    def test_get_request_to_logout_returns_bad_request_error(self):
+        response = self.client.get("/logout/")
+        self.assertEqual(response.status_code, 400)
+
+    def test_logout_link_removes_session_data(self):
+        self.client.post("/logout/")
+        session_objects = Session.objects.all()
+        number_of_sessions = len(session_objects)
+        self.assertTrue(number_of_sessions == 0)
+
+    def test_logout_link_redirects_to_login(self):
+        response = self.client.post("/logout/")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/login/')
 

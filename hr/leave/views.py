@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseBadRequest
 
 @login_required
 def home_page(request):
@@ -42,3 +43,12 @@ def login_page(request):
             return render(request, "login.html", context)
     else:
         return render(request, "login.html")
+
+@login_required
+def logout_page(request):
+    if request.method == "GET":
+        return HttpResponseBadRequest()
+    if request.method == "POST":
+        logout(request)
+        return redirect("/login/")
+

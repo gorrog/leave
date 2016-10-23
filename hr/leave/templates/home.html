@@ -2,6 +2,14 @@
 {% block title %}
 {{ username }}'s Leave
 {% endblock %}
+{% block nav %}
+<nav>
+  <form method="POST" action="/logout/">
+    <input type='submit' id="logout" value="Log Out">
+    {% csrf_token %}
+  </form>
+</nav>
+{% endblock %}
 
 {% block main_content %}
     <h1>
