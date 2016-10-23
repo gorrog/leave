@@ -120,6 +120,9 @@ class LogoutTest(LiveServerTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_logout_link_removes_session_data(self):
+        session_objects = Session.objects.all()
+        number_of_sessions = len(session_objects)
+        self.assertTrue(number_of_sessions == 1)
         self.client.post("/logout/")
         session_objects = Session.objects.all()
         number_of_sessions = len(session_objects)
