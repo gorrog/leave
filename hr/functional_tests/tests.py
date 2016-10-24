@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from time import sleep
+from datetime import datetime
 
 class BobVisitorTest(LiveServerTestCase):
 
@@ -161,15 +162,36 @@ class BobVisitorTest(LiveServerTestCase):
 
         # Undeterred, Bob enters his username and password and hits Enter.
         # Amazingly, he makes no mistakes this time
-        self.fail("Finish the test")
+        username_input = self.browser.find_element_by_css_selector(
+                "input.username"
+                )
+        username_input.send_keys("Bobby12")
+        password_input = self.browser.find_element_by_css_selector(
+                "input.password"
+                )
+        password_input.send_keys("Bobobo1234")
+        password_input.send_keys(Keys.ENTER)
 
         # He is successfully logged in. Bob knows this because he can see the
-        # 'log off' link. He makes a mental note not to click that again until
-        # he wants to log off.
-        self.fail("Finish the test")
+        # 'log off' button. He makes a mental note not to click that again 
+        # until he wants to log off.
+        logout_button = self.browser.find_element_by_css_selector(
+                "input#logout"
+                )
+        self.assertIn("Log Out", logout_button.get_attribute("value"))
 
-        # On the page Bob can see how many days he has remaining in 2016
-        self.fail("Finish the test")
+        ## This appears to be necessary to make Selenium wait for the browser
+        ## to update.
+        sleep(5)
+
+        # On the page Bob can see how many leave days he has remaining in the
+        # current year
+        selected_year = self.browser.find_element_by_id("selected_year")
+        current_year = datetime.strftime(datetime.now(), "%Y")
+        self.assertEqual(selected_year.text, current_year)
+        days_remaining = self.browser.find_element_by_id("days_remaining")
+        self.assertTrue(str.isdigit(days_remaining.text))
+
 
         # Bob didn't take any leave the previous year so he has 5 days in
         # addition to his 18 allowed for this year (23 in total). Bob remembers

@@ -15,5 +15,22 @@
     <h1>
       {{ username }}'s Leave
     </h1>
+    <p>
+    {{ username }}, you have <span id="days_remaining">{{ days_remaining }}
+    </span> days left in <span id="selected_year">{{ selected_year }}</span>.
+    </p>
+    <form method="GET" action="/">
+      <fieldset>
+        <legend>
+          Change Selected Year
+        </legend>
+        <select name="year" id="year_picker">
+          {% for year in years %}
+          <option value="{{ year }}">{{ year }}</option>
+          {% endfor %}
+        </select>
+        <input type='submit' value="Change" />
+      </fieldset>
+    </form>
 
 {% endblock %}

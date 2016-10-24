@@ -5,7 +5,12 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth import authenticate
 from django.contrib.sessions.models import Session
 
+from datetime import datetime
+
+
 from leave.views import login_page, home_page
+
+from leave.models import Employee, Leave
 
 class LoginPageTest(LiveServerTestCase):
 
@@ -133,3 +138,92 @@ class LogoutTest(LiveServerTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/login/')
 
+class HomePageTest(LiveServerTestCase):
+    def setUp(self):
+        username = "Bobby12"
+        password = "Bobobo1234"
+        User.objects.create_user(username, password = password)
+        self.user = authenticate(username=username, password=password)
+        self.client.login(username=username, password=password)
+
+    def tearDown(self):
+        pass
+
+    def test_no_arguments_request_to_home_page_returns_current_year(self):
+        response = self.client.get("/")
+        current_year = datetime.strftime(datetime.now(), "%Y")
+        self.assertContains(response, current_year)
+
+class EmployeeModelTest(LiveServerTestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_saving_and_recalling_items(self):
+        first_employee = Employee()
+        first_employee.start_date = "2015-02-13"
+        first_employee.username = "Jackie1"
+        first_employee.save()
+
+        second_employee = Employee()
+        second_employee.start_date = "2013-08-03"
+        first_employee.username = "Jackie2"
+        second_employee.save()
+
+        saved_items = Employee.objects.all()
+        self.assertEqual(saved_items.count(), 2)
+
+        first_retrieved_employee = saved_items[0]
+        first_start_date = str(first_retrieved_employee.start_date)
+        self.assertEqual(first_start_date, "2015-02-13")
+#TODO:  self.assertEqual(first_retrieved_employee.leave_remaining, 23)
+
+        second_retrieved_employee = saved_items[1]
+        second_start_date = str(second_retrieved_employee.start_date)
+        self.assertEqual(second_start_date, "2013-08-03")
+#TODO:  self.assertEqual(second_retrieved_employee.leave_remaining, 23)
+
+class LeaveModelTest(LiveServerTestCase):
+    def setUp(self):
+        self.first_employee = Employee()
+        self.first_employee.start_date = "2015-02-13"
+        self.first_employee.username = "Jackie1"
+        self.first_employee.save()
+
+        self.second_employee = Employee()
+        self.second_employee.start_date = "2013-08-03"
+        self.second_employee.username = "Jackie2"
+        self.second_employee.save()
+
+    def test_saving_and_recalling_items(self):
+        first_leave = Leave()
+        first_leave.start_date = "2013-03-28"
+        first_leave.end_date = "2013-04-05"
+        first_leave.status = "approved"
+        first_leave.employee = self.first_employee
+        first_leave.save()
+
+        second_leave = Leave()
+        second_leave.start_date = "2014-05-08"
+        second_leave.end_date = "2014-05-15"
+        second_leave.status = "declined"
+        # We use the first employee for both leave objects
+        second_leave.employee = self.first_employee
+        second_leave.save()
+
+        saved_items = Leave.objects.all()
+        self.assertEqual(saved_items.count(), 2)
+
+        first_retrieved_leave = saved_items[0]
+        first_start_date = str(first_retrieved_leave.start_date)
+        self.assertEqual(first_start_date, "2013-03-28")
+        self.assertEqual(first_retrieved_leave.employee, self.first_employee)
+        self.assertEqual(first_retrieved_leave.days_of_leave, 7)
+
+        second_retrieved_leave = saved_items[1]
+        second_start_date = str(second_retrieved_leave.start_date)
+        self.assertEqual(second_start_date, "2014-05-08")
+        self.assertEqual(second_retrieved_leave.employee, self.first_employee)
+        self.assertEqual(second_retrieved_leave.days_of_leave, 6)

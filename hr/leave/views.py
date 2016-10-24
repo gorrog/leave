@@ -3,12 +3,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseBadRequest
 
+from datetime import datetime
+
 @login_required
 def home_page(request):
     username = request.user.username
     context = {
             'username': username
             }
+    if request.GET.get('year') in [None,'']:
+        current_year = datetime.strftime(datetime.now(), "%Y")
+        context["selected_year"] = current_year
     return render(request, "home.html", context)
 
 def login_page(request):
