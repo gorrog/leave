@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 
-from datetime import datetime
+from .models import Employee
 
 @login_required
 def home_page(request):
@@ -11,9 +11,17 @@ def home_page(request):
     context = {
             'username': username
             }
-    if request.GET.get('year') in [None,'']:
-        current_year = datetime.strftime(datetime.now(), "%Y")
-        context["selected_year"] = current_year
+    try:
+        employee = Employee.objects.get(username = username)
+    except Employee.DoesNotExist:
+        error_message = """
+            Employee object with username {username} doesn't exist.
+            Aborting...
+            """
+        error_message = error_message.format(username = username)
+        return HttpResponse(error_message)
+
+    context["leave_remaining"] = employee.leave_remaining
     return render(request, "home.html", context)
 
 def login_page(request):
