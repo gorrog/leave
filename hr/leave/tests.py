@@ -178,12 +178,30 @@ class EmployeeModelTest(LiveServerTestCase):
         first_retrieved_employee = saved_items[0]
         first_start_date = str(first_retrieved_employee.start_date)
         self.assertEqual(first_start_date, "2015-02-13")
-#TODO:  self.assertEqual(first_retrieved_employee.leave_remaining, 23)
 
         second_retrieved_employee = saved_items[1]
         second_start_date = str(second_retrieved_employee.start_date)
         self.assertEqual(second_start_date, "2013-08-03")
-#TODO:  self.assertEqual(second_retrieved_employee.leave_remaining, 23)
+
+    def test_calculated_fields_correct(self):
+        first_employee = Employee()
+        first_employee.start_date = "2015-02-13"
+        first_employee.username = "Jackie1"
+        first_employee.save()
+
+        second_employee = Employee()
+        second_employee.start_date = "2013-08-03"
+        first_employee.username = "Jackie2"
+        second_employee.save()
+
+        saved_items = Employee.objects.all()
+        self.assertEqual(saved_items.count(), 2)
+
+        first_retrieved_employee = saved_items[0]
+        self.assertEqual(first_retrieved_employee.leave_remaining, 23)
+
+        second_retrieved_employee = saved_items[1]
+        self.assertEqual(second_retrieved_employee.leave_remaining, 23)
 
 class LeaveModelTest(LiveServerTestCase):
     def setUp(self):
@@ -220,10 +238,10 @@ class LeaveModelTest(LiveServerTestCase):
         first_start_date = str(first_retrieved_leave.start_date)
         self.assertEqual(first_start_date, "2013-03-28")
         self.assertEqual(first_retrieved_leave.employee, self.first_employee)
-        self.assertEqual(first_retrieved_leave.days_of_leave, 7)
+        self.assertEqual(first_retrieved_leave.working_days_in_leave_period, 7)
 
         second_retrieved_leave = saved_items[1]
         second_start_date = str(second_retrieved_leave.start_date)
         self.assertEqual(second_start_date, "2014-05-08")
         self.assertEqual(second_retrieved_leave.employee, self.first_employee)
-        self.assertEqual(second_retrieved_leave.days_of_leave, 6)
+        self.assertEqual(second_retrieved_leave.working_days_in_leave_period, 6)
