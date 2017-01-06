@@ -1,5 +1,5 @@
 from django.test import LiveServerTestCase
-from django.contrib.auth.models import User
+from leave.models import Employee
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from time import sleep
@@ -116,7 +116,8 @@ class BobVisitorTest(LiveServerTestCase):
 
 
     def test_bob_can_log_in_and_out(self):
-        User.objects.create_user("Bobby12", password = "Bobobo1234")
+        Employee.objects.create_user(username="Bobby12", password =
+                "Bobobo1234", email="bob@example.com", start_date="2015-01-01")
         self.browser.get(self.live_server_url)
         # Bob fixes the problem and now finally enters the correct username and
         # password.

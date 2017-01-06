@@ -4,13 +4,11 @@ from django.contrib.auth.models import User
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-class Employee(models.Model):
-    user = models.OneToOneField(
-            User,
-            on_delete=models.CASCADE,
-            primary_key = True,
-    )
-    start_date = models.DateField()
+class Employee(User):
+    start_date = models.DateField(
+            blank = False,
+            null = False
+            )
 
     def _leave_remaining(self):
         """

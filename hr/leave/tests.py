@@ -1,7 +1,7 @@
 from django.test import LiveServerTestCase
 from django.http import HttpRequest
 from django.template.loader import render_to_string
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import authenticate
 from django.contrib.sessions.models import Session
 
@@ -98,7 +98,8 @@ class LoginPageTest(LiveServerTestCase):
         self.assertContains(response, "Log In", status_code=200)
 
     def test_correct_credentials_redirects_to_home_page_view(self):
-        User.objects.create_user("Bobby12", password = "Bobobo1234")
+        Employee.objects.create_user("Bobby12", password = "Bobobo1234",
+                start_date="2015-01-01")
         post_data = {
                 "username": "Bobby12",
                 "password": "Bobobo1234"
@@ -112,7 +113,9 @@ class LogoutTest(LiveServerTestCase):
     def setUp(self):
         username = "Bobby12"
         password = "Bobobo1234"
-        User.objects.create_user(username, password = password)
+        start_date = "2015-01-01"
+        Employee.objects.create_user(username=username, password=password,
+                start_date=start_date)
         self.user = authenticate(username=username, password=password)
         self.client.login(username=username, password=password)
 
@@ -142,7 +145,9 @@ class HomePageTest(LiveServerTestCase):
     def setUp(self):
         username = "Bobby12"
         password = "Bobobo1234"
-        User.objects.create_user(username, password = password)
+        start_date = "2015-01-01"
+        Employee.objects.create_user(username=username, password=password,
+                start_date=start_date)
         self.user = authenticate(username=username, password=password)
         self.client.login(username=username, password=password)
 
