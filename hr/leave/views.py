@@ -21,6 +21,9 @@ def home_page(request):
         error_message = error_message.format(username = username)
         return HttpResponse(error_message)
 
+    latest_period = employee.current_period
+    context["period_start"] = latest_period[0]
+    context["period_end"] = latest_period[1]
     context["leave_remaining"] = employee.leave_remaining
     return render(request, "home.html", context)
 

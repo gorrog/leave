@@ -3,7 +3,6 @@ from leave.models import Employee
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from time import sleep
-from datetime import datetime
 
 class BobVisitorTest(LiveServerTestCase):
 
@@ -186,12 +185,9 @@ class BobVisitorTest(LiveServerTestCase):
         sleep(5)
 
         # On the page Bob can see how many leave days he has remaining in the
-        # current year
-        selected_year = self.browser.find_element_by_id("selected_year")
-        current_year = datetime.strftime(datetime.now(), "%Y")
-        self.assertEqual(selected_year.text, current_year)
-        days_remaining = self.browser.find_element_by_id("days_remaining")
-        self.assertTrue(str.isdigit(days_remaining.text))
+        # current period
+        leave_remaining = self.browser.find_element_by_id("leave_remaining")
+        self.assertTrue(str.isdigit(leave_remaining.text))
 
 
         # Bob didn't take any leave the previous year so he has 5 days in

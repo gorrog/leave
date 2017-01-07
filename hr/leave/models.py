@@ -25,6 +25,14 @@ class Employee(User):
         return days_remaining
     leave_remaining = property(_leave_remaining)
 
+    def _current_period(self):
+        """
+        Return the start and end date of the latest working period
+        """
+        periods = self.get_periods(self.start_date, date.today())
+        return periods[-1]
+    current_period = property(_current_period)
+
 
     def get_periods(self, start_date, end_date):
         """
